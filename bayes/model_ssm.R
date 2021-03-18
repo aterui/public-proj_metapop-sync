@@ -4,8 +4,7 @@ model {
   
   ninfo <- 1.0E-3
   u <- 10
-  df <- 1
-  s <- rep(1, N_river)
+  df <- 2
   
   # prior -------------------------------------------------------------------
   
@@ -21,14 +20,12 @@ model {
   for (i in 1:N_river) {
     ## mean growth rate r
     mean_log_r[i] ~ dnorm(0, ninfo)
-
+    tau_eps_r[i] ~ dscaled.gamma(u, df)
+    sigma_eps_r[i] <- 1 / sqrt(tau_eps_r[i])
+    
     ## initial density
-    log_mean_d[1, i] ~ dnorm(0, ninfo)
+    log_mean_d[1, i] ~ dnorm(0, 0.1)
   }
-  
-  ## variance-covariance in r
-  m_tau_r[1:N_river, 1:N_river] ~ dwish(w[,], N_river + 1)
-  m_sigma_r[1:N_river, 1:N_river] <- inverse(m_tau_r[,])
   
   
   # observation -------------------------------------------------------------
@@ -48,8 +45,8 @@ model {
   for (t in 1:(N_year - 1)) {
     for (i in 1:N_river) {
       log_mean_d[t + 1, i] <- log_r[t, i] + log_mean_d[t, i]
+      log_r[t, i] ~ dnorm(mean_log_r[i], tau_eps_r[i])
     } 
-    log_r[t, 1:N_river] ~ dmnorm(mean_log_r[], m_tau_r[,])
   }
   
   
