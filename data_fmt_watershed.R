@@ -8,6 +8,8 @@
   
 # select by occurrence frequency ------------------------------------------
 
+  freq_threshold <- 3
+  
   df_freq <- d0 %>% 
     group_by(year, river, LatinName) %>% 
     summarize(summed_n = sum(sample1 + sample2, na.rm = T)) %>% 
@@ -16,14 +18,14 @@
     summarize(freq = n())
   
   species <- df_freq %>% 
-    filter(freq > 2) %>% 
+    filter(freq > freq_threshold) %>% 
     ungroup() %>% 
     distinct(LatinName) %>% 
     pull()
   
   dat_list <- foreach(i = seq_len(length(species))) %do% {
     river_f3 <- df_freq %>% 
-      filter(freq > 2 & LatinName == species[i]) %>% 
+      filter(freq > freq_threshold & LatinName == species[i]) %>% 
       pull(river)
     
     dat <- d0 %>% 
