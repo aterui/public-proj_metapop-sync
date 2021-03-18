@@ -60,13 +60,12 @@
                  N_sample = N_sample,
                  N_year = N_year,
                  N_river = N_river,
-                 N_site = N_site,
-                 w = diag(N_river))
+                 N_site = N_site)
   
   para <- c("mu_log_area",
             "sigma_log_area",
             "mean_log_r",
-            "m_sigma_r",
+            "sigma_eps_r",
             "sigma_eps_site")
   
   m <- read.jagsfile("bayes/model_ssm.R")
