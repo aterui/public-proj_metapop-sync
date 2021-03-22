@@ -9,7 +9,7 @@ model {
   # prior -------------------------------------------------------------------
   
   ## sampling area
-  mu_log_area ~ dnorm(0, ninfo)
+  log_area_mean ~ dnorm(0, ninfo)
   tau_log_area ~ dscaled.gamma(u, df)
   sigma_log_area <- 1 / sqrt(tau_log_area)
   
@@ -19,14 +19,15 @@ model {
   
   for (i in 1:N_river) {
     ## mean growth rate r
-    mean_log_r[i] ~ dnorm(0, ninfo)
+    log_r_mean[i] ~ dnorm(log_r_global, ninfo)
     tau_eps_r[i] ~ dscaled.gamma(u, df)
     sigma_eps_r[i] <- 1 / sqrt(tau_eps_r[i])
     
     ## initial density
-    log_mean_d[1, i] ~ dnorm(0, 0.1)
+    log_d_mean[1, i] ~ dnorm(0, 0.1)
   }
   
+  log_r_global ~ dnorm(0, ninfo)
   
   # observation -------------------------------------------------------------
   
@@ -35,7 +36,7 @@ model {
     log(n_obs[Year[n], River[n], Site[n]]) <- log_d_obs[Year[n], River[n], Site[n]] +
                                               log_Area[n]
     
-    log_Area[n] ~ dnorm(mu_log_area, tau_log_area)
+    log_Area[n] ~ dnorm(log_area_mean, tau_log_area)
   }
 
   
@@ -44,8 +45,8 @@ model {
   ## metapopulation-level dynamics
   for (t in 1:(N_year - 1)) {
     for (i in 1:N_river) {
-      log_mean_d[t + 1, i] <- log_r[t, i] + log_mean_d[t, i]
-      log_r[t, i] ~ dnorm(mean_log_r[i], tau_eps_r[i])
+      log_d_mean[t + 1, i] <- log_r[t, i] + log_d_mean[t, i]
+      log_r[t, i] ~ dnorm(log_r_mean[i], tau_eps_r[i])
     } 
   }
   
@@ -54,7 +55,7 @@ model {
   for (i in 1:N_river) {
     for (j in 1:N_site[i]) {
       for (t in 1:N_year) {
-          log_d_obs[t, i, j] <- log_mean_d[t, i] + eps_site[i, j]
+          log_d_obs[t, i, j] <- log_d_mean[t, i] + eps_site[i, j]
       }
       eps_site[i, j] ~ dnorm(0, tau_eps_site)
     }
