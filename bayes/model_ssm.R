@@ -19,7 +19,7 @@ model {
   
   for (i in 1:N_river) {
     ## mean growth rate r
-    log_r_mean[i] ~ dnorm(log_r_global, ninfo)
+    log_r_mean[i] ~ dnorm(log_r_global, tau_r_global)
     tau_eps_r[i] ~ dscaled.gamma(u, df)
     sigma_eps_r[i] <- 1 / sqrt(tau_eps_r[i])
     
@@ -27,7 +27,10 @@ model {
     log_d_mean[1, i] ~ dnorm(0, 0.1)
   }
   
+  ## priors for global r
   log_r_global ~ dnorm(0, ninfo)
+  tau_r_global ~ dscaled.gamma(u, df)
+  sigma_r_global <- 1 / sqrt(tau_r_global)
   
   # observation -------------------------------------------------------------
   

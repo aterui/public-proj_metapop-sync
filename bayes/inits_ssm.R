@@ -5,7 +5,7 @@
   source(here::here("data_fmt_watershed.R"))
   
   n_ad <- 100
-  n_iter <- 500
+  n_iter <- 1.0E+4
   n_thin <- max(3, ceiling(n_iter/500))
   n_burn <- ceiling(max(10, n_iter/2))
   n_sample <- ceiling(n_iter/n_thin)
@@ -75,6 +75,7 @@
                    N_site = N_site)
     
     para <- c("log_r_global",
+              "sigma_r_global",
               "log_r_mean",
               "sigma_eps_r",
               "sigma_eps_site",
@@ -100,7 +101,7 @@
     
     mcmc_summary <- MCMCvis::MCMCsummary(post$mcmc)
     
-    while(any(mcmc_summary$Rhat >= 1.1)) {
+    while(any(mcmc_summary$n.eff < 100)) {
       print(max(mcmc_summary$Rhat))
       message("estimates do not converge - extend simulations")
       post <- extend.jags(post,
