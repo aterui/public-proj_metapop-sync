@@ -3,12 +3,13 @@
   
   rm(list = ls())
   pacman::p_load(tidyverse, foreach)
-  d0 <- read_csv(here::here("data_fmt/data_hkd_prtwsd_fmt.csv"))
+  d0 <- read_csv(here::here("data_fmt/data_hkd_prtwsd_fmt.csv")) %>% 
+    filter(LatinName %in% c("Oncorhynchus_masou_masou", "Salvelinus_leucomaenis_leucomaenis"))
 
-  
+
 # select by occurrence frequency ------------------------------------------
 
-  freq_threshold <- 3
+  freq_threshold <- 2
   
   df_freq <- d0 %>% 
     group_by(year, river, LatinName) %>% 
