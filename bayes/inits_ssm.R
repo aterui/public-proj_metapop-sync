@@ -100,10 +100,27 @@
     
     mcmc_summary <- MCMCvis::MCMCsummary(post$mcmc)
     
+    while(any(mcmc_summary$Rhat >= 1.1)) {
+      print(max(mcmc_summary$Rhat))
+      message("estimates do not converge - extend simulations")
+      post <- extend.jags(post,
+                          burnin = 0,
+                          sample = n_sample,
+                          adapt = n_ad,
+                          thin = n_thin,
+                          n.sims = 3,
+                          combine = TRUE)
+
+      mcmc_summary <- MCMCvis::MCMCsummary(post$mcmc)
+    }
+    
+    mcmc_iter <- (post$sample / n_sample) * n_iter + n_burn
+    
     # format results
     mcmc_tibble <- mcmc_summary %>% 
       as_tibble() %>% 
-      mutate(species = unique(dat$LatinName),
+      mutate(mcmc_iter = mcmc_iter,
+             species = unique(dat$LatinName),
              param = rownames(mcmc_summary)) %>% 
       mutate(param_id = str_remove_all(param, "\\[.{1,}\\]")) %>% 
       mutate(river_id = case_when(param_id != "log_d_mean" ~ rm_bracket(param),
@@ -124,4 +141,8 @@
     
     return(mcmc_tibble)
   }
+  
+  write_csv(joint_summary, here::here("data_est/data_ssm_est.csv"))
+  
+  
   
