@@ -5,8 +5,8 @@
   source(here::here("data_fmt_watershed.R"))
   
   n_ad <- 100
-  n_iter <- 1.0E+4
-  n_thin <- max(3, ceiling(n_iter/500))
+  n_iter <- 2.0E+3
+  n_thin <- 50
   n_burn <- ceiling(max(10, n_iter/2))
   n_sample <- ceiling(n_iter/n_thin)
 
@@ -56,6 +56,7 @@
     inits <- replicate(3,
                        list(
                          log_r_mean = rep(0, N_river),
+                         tau_eps_r = rep(1, N_river),
                          tau_eps_site = 1,
                          .RNG.name = "base::Mersenne-Twister",
                          .RNG.seed = NA
@@ -101,7 +102,7 @@
     
     mcmc_summary <- MCMCvis::MCMCsummary(post$mcmc)
     
-    while(any(mcmc_summary$n.eff < 100)) {
+    while(any(mcmc_summary$Rhat > 1.1)) {
       print(max(mcmc_summary$Rhat))
       message("estimates do not converge - extend simulations")
       post <- extend.jags(post,
@@ -121,6 +122,8 @@
     mcmc_tibble <- mcmc_summary %>% 
       as_tibble() %>% 
       mutate(mcmc_iter = mcmc_iter,
+             n_thin = n_thin,
+             n_burn = n_burn,
              species = unique(dat$LatinName),
              param = rownames(mcmc_summary)) %>% 
       mutate(param_id = str_remove_all(param, "\\[.{1,}\\]")) %>% 
