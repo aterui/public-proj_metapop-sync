@@ -73,7 +73,7 @@
   (g1 | g2) / (g3 | g4) / (g5 | g6)
 
 #' Time series data used for the calculation of diversity deficit.
-#+ echo = FALSE, message = FALSE
+#+ echo = FALSE, message = FALSE, fig.height = 8, fig.width = 8
   
 # plot time series --------------------------------------------------------
 

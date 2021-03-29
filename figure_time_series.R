@@ -16,7 +16,8 @@
     ggplot() +
     geom_line(aes(x = year_id, y = median + log(100), color = species)) +
     facet_wrap(facets = ~ river) +
-    ylab("Fish density (ind./100 sq-m)") +
-    xlab("Year")
+    ylab("ln(fish density (ind./100 sq-m))") +
+    xlab("Year") +
+    theme(legend.position="bottom")
   
   print(g)
