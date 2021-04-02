@@ -72,7 +72,7 @@
   
   (g1 | g2) / (g3 | g4) / (g5 | g6)
 
-#' Time series data used for the calculation of diversity deficit.
+#' Time series data used for the calculation of diversity deficit. Each panel represents watersheds.
 #+ echo = FALSE, message = FALSE, fig.height = 8, fig.width = 8
   
 # plot time series --------------------------------------------------------
